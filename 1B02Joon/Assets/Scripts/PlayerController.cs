@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     [Header("Player Movement")]
     public float moveSpeed = 5.0f;      //이동 속도 
     public float jumpForce = 5.0f;      //점프 힘
+    public float rotationSpeed = 10f;      //회전 힘
 
     //카메라 설정 변수 
     [Header("Camera Setting")]
@@ -45,9 +46,14 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         HandleJump();
-        HandleMovement();
         HandleRotation();
         HandleCameraToggle();
+    }
+
+    private void FixedUpdate()
+    {
+
+        HandleMovement();
     }
     void HandleCameraToggle()
     {
@@ -78,11 +84,9 @@ public class PlayerController : MonoBehaviour
         targetVerticalRotion = Mathf.Clamp(targetVerticalRotion, yMinLimit, yMaxLimit); //수직 회전 제한
         phi = Mathf.MoveTowards(phi, targetVerticalRotion, verticalRoationSpeed * Time.deltaTime);
 
-        //플레이어 회전(캐릭터가 수평으로만 회전)
-        transform.rotation = Quaternion.Euler(0.0f, theta, 0.0f);
-
         if (isFirstPerson)
         {
+            transform.rotation = Quaternion.Euler(0.0f, theta, 0.0f);       //플레이어 회전(캐릭터가 수평으로만 회전)
             firstPersonCamera.transform.localRotation = Quaternion.Euler(phi, 0.0f, 0.0f);  //1인칭 카메라 수직 회전
         }
         else
@@ -110,6 +114,7 @@ public class PlayerController : MonoBehaviour
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
 
+        Vector3 movement;
         if(!isFirstPerson)  //3인칭 모드 일 때 카메라 방향으로 이동 처리
         {
             Vector3 cameraForward = thirdPersonCamera.transform.forward;    //카메라 앞 방향 
@@ -121,15 +126,22 @@ public class PlayerController : MonoBehaviour
             cameraRight.Normalize();
 
             //이동 벡터 게산
-            Vector3 movement = cameraForward * moveVertical + cameraRight * moveHorizontal;
-            rigidbody.MovePosition(rigidbody.position + movement * moveSpeed * Time.deltaTime);     //물리 기반 이동 
+            movement = cameraForward * moveVertical + cameraRight * moveHorizontal;
         }
         else
         {
             //캐릭터 기준으로 이동
-            Vector3 movement = transform.right * moveHorizontal + transform.forward * moveVertical;
-            rigidbody.MovePosition(rigidbody.position + movement * moveSpeed * Time.deltaTime);     //물리 기반 이동 
+            movement = transform.right * moveHorizontal + transform.forward * moveVertical;
         }
+
+        //이동 방향으로 회전
+        if (movement.magnitude > 0.1f)
+        {
+            Quaternion toRotation = Quaternion.LookRotation(movement, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
+        }
+
+        rigidbody.MovePosition(rigidbody.position +movement * moveSpeed * Time.deltaTime);
     }
 
     //플레이어 점프를 처리하는 함수
