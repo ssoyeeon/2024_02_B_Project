@@ -15,6 +15,19 @@ public class PlayerController : MonoBehaviour
     public Camera firstPersonCamera;        //1인칭 카메라
     public Camera thirdPersonCamera;        //3인칭 카메라
 
+    public float cameraDistance = 5.0f;     //카메라 거리
+    public float minDistance = 1.0f;        //
+    public float maxDistance = 10.0f;
+
+    private float CurrentX = 0.0f;          //수평 회전 각도
+    private float CurrentY = 45.0f;         //수직 회전 각도
+    public float mouseSenesitiviy = 100.0f;    //마우스 감도
+
+    private const float Y_ANGLE_MIN = 0.0f;
+    private const float Y_ANGLE_MAX = 50.0f;    
+
+
+
     public float radius = 5.0f;             //3인칭 카메라와 플레이어 간의 거리
     public float minRadius = 1.0f;          //카메라 최소 거리
     public float maxRadius = 10.0f;         //카메라 최대 거리 
@@ -30,7 +43,7 @@ public class PlayerController : MonoBehaviour
     public float mouseSenesitivity = 2f;    //마우스 감도
 
     //내부 변수들
-    private bool isFirstPerson = true;  //1인칭 모드인지 여부 
+    public bool isFirstPerson = true;  //1인칭 모드인지 여부 
     //private bool isGrounded;            //플레이어가 땅에 있는지 여부 
     private Rigidbody rigidbody;        //플레이어 리지드바디 
 
@@ -82,34 +95,28 @@ public class PlayerController : MonoBehaviour
 
     public void HandleRotation()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSenesitivity;    //마우스 좌우 입력
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSenesitivity;    //마우스 상하 입력
+        float mouseX = Input.GetAxis("Mouse X") * mouseSenesitiviy * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSenesitiviy * Time.deltaTime;
 
-        //수평 회전 
-        theta += mouseX;    //마우스 입력값 추가
-        theta = Mathf.Repeat(theta, 360f);  //각도 값이 360을 넘지 않도록 조정
-
-        //수직 회전
-        targetVerticalRotion -= mouseY;
-        targetVerticalRotion = Mathf.Clamp(targetVerticalRotion, yMinLimit, yMaxLimit); //수직 회전 제한
-        phi = Mathf.MoveTowards(phi, targetVerticalRotion, verticalRoationSpeed * Time.deltaTime);
-
-        if (isFirstPerson)
+        if(isFirstPerson)
         {
-            transform.rotation = Quaternion.Euler(0.0f, theta, 0.0f);       //플레이어 회전(캐릭터가 수평으로만 회전)
-            firstPersonCamera.transform.localRotation = Quaternion.Euler(phi, 0.0f, 0.0f);  //1인칭 카메라 수직 회전
+            transform.rotation = Quaternion.Euler(0.0f, CurrentX, 0.0f);
+            firstPersonCamera.transform.localRotation = Quaternion.Euler(CurrentY, 0.0f, 0.0f);
+
         }
         else
         {
-            float x = radius * Mathf.Sin(Mathf.Deg2Rad * phi) * Mathf.Cos(Mathf.Deg2Rad * theta);
-            float y = radius * Mathf.Cos(Mathf.Deg2Rad * phi);
-            float z = radius * Mathf.Sin(Mathf.Deg2Rad * phi) * Mathf.Sin(Mathf.Deg2Rad * theta);
+            CurrentX += mouseX;
+            CurrentY -= mouseY;
 
-            thirdPersonCamera.transform.position = transform.position + new Vector3(x, y, z);
-            thirdPersonCamera.transform.LookAt(transform);  //카메라가 항상 플레이어를 바라보도록 설정
+            CurrentY = Mathf.Clamp(CurrentY, Y_ANGLE_MIN, Y_ANGLE_MAX);
 
-            //마우스 스크롤을 이용하여 카메라 줌 조정
-            radius = Mathf.Clamp(radius - Input.GetAxis("Mouse ScrollWheel") * 5, minRadius, maxRadius);
+            Vector3 dir = new Vector3(0,0, - cameraDistance);
+            Quaternion rotation = Quaternion.Euler(CurrentY, CurrentX, 0.0f);
+            thirdPersonCamera.transform.position = transform.position + rotation * dir;
+            thirdPersonCamera.transform.LookAt(transform.position);
+
+            cameraDistance = Mathf.Clamp(cameraDistance - Input.GetAxis("Mouse ScrollWheel") * 5, minDistance, maxDistance);
         }
     }
 

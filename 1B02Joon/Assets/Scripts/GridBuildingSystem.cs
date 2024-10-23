@@ -27,7 +27,7 @@ public class GridBuildingSystem : MonoBehaviour
     [SerializeField] private float cellSize = 1;
 
     [SerializeField] private GameObject cellPrefab;
-    [SerializeField] private GameObject buildingPregab;
+    [SerializeField] private GameObject bulidingPrefabs;
     [SerializeField] private PlayerController playerController;
     [SerializeField] private float maxBulidDistance = 5f;
 
@@ -147,6 +147,7 @@ public class GridBuildingSystem : MonoBehaviour
                 Debug.DrawRay(ray.origin, ray.direction * hitInfo.distance, Color.white);
             }
         }
+        return Vector3.zero;
     }
     private bool isValifGridPosition(Vector3Int gridPosition)
     {

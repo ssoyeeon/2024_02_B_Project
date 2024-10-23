@@ -36,6 +36,10 @@ public class PlayerStateMachine : MonoBehaviour
 
     public void TransitionToState(PlayerState newState)
     {
+        if(currentState?.GetType() == newState.GetType())
+        {
+            return;
+        }
         currentState?.Exit();       //검사해서 호출 종료 ?는 IF 조건
 
         currentState = newState;

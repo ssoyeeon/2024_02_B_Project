@@ -2,16 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class PlayerState : MonoBehaviour
+public abstract class PlayerState
 {
     protected PlayerStateMachine stateMachine;        //상ㅌㅐ 머시ㄴㅇㅔ 대하ㄴ 참ㅈㅗ (이후 구혀ㄴ) 
     protected PlayerController playerController;        //플ㄹㅔㅇㅣㅇㅓ 컨ㅌㅡㄹㅗㄹ러에 대하ㄴ 참ㅈㅗ 
+    protected PlayerAnimationManager animationManager;
 
     //생ㅅㅓㅇ자 상ㅌㅐ 머시ㄴㄱㅘ 플ㄹㅔㅇㅣㅇㅓ 컨ㅌㅡㄹㅗㄹ러 참ㅈㅗ 초기화 
     public PlayerState(PlayerStateMachine stateMachine)
     {
         this.stateMachine = stateMachine;
         this.playerController = stateMachine.PlayerController;
+        this.animationManager = stateMachine.GetComponent<PlayerAnimationManager>();
     }
 
     //가상 메서드들 : 하위 클래스에서 필요에 따라 오버라이트
@@ -67,10 +69,14 @@ public class IdleState : PlayerState
 }
 public class MovingState : PlayerState
 {
+    private bool isRunning;
     public MovingState(PlayerStateMachine stateMachine) : base(stateMachine) { }
 
     public override void Update()
     {
+        //달리기 입력 확인
+        isRunning = Input.GetKey(KeyCode.LeftShift);
+
         CheckTransitions();     //매 프레임마다 상태 전환 조건 체크 
     }
     public override void FixedUpdate()
