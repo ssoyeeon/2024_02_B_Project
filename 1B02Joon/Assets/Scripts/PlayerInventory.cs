@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
+    private SurvivalStats survivalStats;
     //각ㄱㅏㄱ의 아이템 개수를 저자ㅇㅎㅏㄴㅡㄴ 변ㅅㅜ 
     public int crystalCount = 0;        //크리스타ㄹ 개수 
     public int plantCount = 0;          //식ㅁㅜㄹ 개수 
@@ -102,6 +103,35 @@ public class PlayerInventory : MonoBehaviour
                 return treeCount;
             default:
                 return 0;
+        }
+    }
+
+    void Start()
+    {
+        survivalStats = GetComponent<SurvivalStats>();
+    }
+    
+    public void UseItem(ItemType itemType)
+    {
+        if( Getitemcount(itemType) <= 0)
+        {
+            return;
+        }
+
+        switch (itemType)
+        {
+            case ItemType.VegetableStew:
+                Removeitem(ItemType.VegetableStew, 1);
+                survivalStats.EatFood(RecipeList.kitchenRecipes[0].hungerRestoreAmount);
+                break;
+            case ItemType.FruitSalad:
+                Removeitem(ItemType.FruitSalad, 1);
+                survivalStats.EatFood(RecipeList.kitchenRecipes[0].hungerRestoreAmount);
+                break;
+            case ItemType.RepairKit:
+                Removeitem(ItemType.RepairKit, 1);
+                survivalStats.EatFood(RecipeList.WorkbenchRecipes[0].repairAmount);
+                break;
         }
     }
 

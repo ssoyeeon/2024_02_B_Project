@@ -28,17 +28,17 @@ public abstract class PlayerState
         if(playerController.isGrounded())
         {
             //지상에 있을 때의 상태 전환 로직
-            if(Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space))         //스페이스를 눌었을때
             {
                 stateMachine.TransitionToState(new JumpingState(stateMachine));
             }
-            else if(Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+            else if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0) //이동키가 눌렸을때 
             {
                 stateMachine.TransitionToState(new MovingState(stateMachine));
             }
             else
             {
-                    stateMachine.TransitionToState(new IdleState(stateMachine));
+                stateMachine.TransitionToState(new IdleState(stateMachine));
             }
         }
         else
@@ -49,7 +49,7 @@ public abstract class PlayerState
             }
             else
             {
-                stateMachine.TransitionToState(new fallingState(stateMachine));
+                stateMachine.TransitionToState(new FallingState(stateMachine));
             }
 
         }
@@ -84,19 +84,7 @@ public class MovingState : PlayerState
         playerController.HandleMovement();
     }
 }
-public class fallingState : PlayerState
-{
-    public fallingState(PlayerStateMachine stateMachine) : base(stateMachine) { }
 
-    public override void Update()
-    {
-        CheckTransitions();     //매 프레임마다 상태 전환 조건 체크 
-    }
-    public override void FixedUpdate()
-    {
-        playerController.HandleMovement();
-    }
-}
 public class JumpingState : PlayerState
 {
     public JumpingState(PlayerStateMachine stateMachine) : base(stateMachine) { }
@@ -108,5 +96,18 @@ public class JumpingState : PlayerState
     public override void FixedUpdate()
     {
         playerController.HandleMovement();
+    }
+}
+public class FallingState : PlayerState
+{
+    public FallingState(PlayerStateMachine stateMachine) : base(stateMachine) { }
+
+    public override void Update()
+    {
+        CheckTransitions();             //매 프레임마다 상태 전환 조건 체크 
+    }
+    public override void FixedUpdate()
+    {
+        playerController.HandleMovement();              //물리 기반 이동 처리 
     }
 }

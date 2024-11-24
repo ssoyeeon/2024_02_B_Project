@@ -7,6 +7,9 @@ public enum ItemType
     Plant,
     Bush,
     Tree,
+    VegetableStew,
+    FruitSalad,
+    RepairKit
 
 }
 public class ItemDetector : MonoBehaviour
@@ -33,7 +36,7 @@ public class ItemDetector : MonoBehaviour
         }
         if(currentNearbyItem != null && Input.GetKeyDown(KeyCode.E))
         {
-            currentNearbyItem.CollectiItem(GetComponent<PlayerInventory>());
+            currentNearbyItem.CollectItem(GetComponent<PlayerInventory>());
         }
     }
     
@@ -70,7 +73,7 @@ public class ItemDetector : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
+        Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, checkRadius);
     }
 }

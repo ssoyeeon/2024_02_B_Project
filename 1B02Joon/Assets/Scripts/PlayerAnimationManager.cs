@@ -17,18 +17,8 @@ public class PlayerAnimationManager : MonoBehaviour
     {
         UpdateAnimationState();
     }
-    public void TriggerAttack()
-    {
-        animator.SetTrigger(PARAM_ATTACK_TRIGGER);
-    }
 
-    private void ResetAllBoolParameters()
-    {
-        animator.SetBool(PARAM_IS_MOVING, false);
-        animator.SetBool(PARAM_IS_FALLING, false);
-        animator.SetBool(PARAM_IS_JUMPING, false);
-        animator.SetBool(PARAM_IS_RUNNING, false);
-    }
+   
 
     private void UpdateAnimationState()
     {
@@ -50,10 +40,23 @@ public class PlayerAnimationManager : MonoBehaviour
                 case JumpingState:
                     animator.SetBool(PARAM_IS_JUMPING , true);
                     break;
-                case fallingState:
+                case FallingState:
                     animator.SetBool(PARAM_IS_FALLING , true);
                     break;
             }
         }
+    }
+
+    public void TriggerAttack()
+    {
+        animator.SetTrigger(PARAM_ATTACK_TRIGGER);
+    }
+
+    private void ResetAllBoolParameters()
+    {
+        animator.SetBool(PARAM_IS_MOVING, false);
+        animator.SetBool(PARAM_IS_FALLING, false);
+        animator.SetBool(PARAM_IS_JUMPING, false);
+        animator.SetBool(PARAM_IS_RUNNING, false);
     }
 }

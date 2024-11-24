@@ -21,10 +21,10 @@ public class PlayerController : MonoBehaviour
 
     private float CurrentX = 0.0f;          //수평 회전 각도
     private float CurrentY = 45.0f;         //수직 회전 각도
-    public float mouseSenesitiviy = 100.0f;    //마우스 감도
 
     private const float Y_ANGLE_MIN = 0.0f;
-    private const float Y_ANGLE_MAX = 50.0f;    
+    private const float Y_ANGLE_MAX = 50.0f;
+    public float mouseSenesitiviy = 200.0f;    //마우스 감도
 
 
 
@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviour
     public float minRadius = 1.0f;          //카메라 최소 거리
     public float maxRadius = 10.0f;         //카메라 최대 거리 
 
-    public float yMinLimit = -90;            //카메라 수직 회전 최소각
+    public float yMinLimit = 30;            //카메라 수직 회전 최소각
     public float yMaxLimit = 90;            //카메라 수직 회전 최대각
 
     private float theta = 0.0f;                 //카메라의 수펴ㅓㅇ 회전 각도
@@ -40,12 +40,10 @@ public class PlayerController : MonoBehaviour
     private float targetVerticalRotion = 0;     //목표 수직 회전 각도
     private float verticalRoationSpeed = 240f;  //수직 회전 속도
 
-    public float mouseSenesitivity = 2f;    //마우스 감도
-
     //내부 변수들
     public bool isFirstPerson = true;  //1인칭 모드인지 여부 
     //private bool isGrounded;            //플레이어가 땅에 있는지 여부 
-    private Rigidbody rigidbody;        //플레이어 리지드바디 
+    private Rigidbody rb;        //플레이어 리지드바디 
 
     public float fallingThreshold = -0.1f;  //떨어지는것으로 간주할 수직 속도 임계값
 
@@ -56,7 +54,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        rigidbody = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
 
         Cursor.lockState = CursorLockMode.Locked;       //마우스 커서를 잠그고 숨긴다.
         SetupCameras();
@@ -65,18 +63,24 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        HandleRotation();
+        HandleCameraToggle();
         if (Input.GetKeyDown(KeyCode.Space))
         {
             HandleJump();
         }
-        HandleRotation();
-        HandleCameraToggle();
     }
 
     private void FixedUpdate()
     {
 
         HandleMovement();
+    }
+
+    void SetAcitiveCamera()
+    {
+        firstPersonCamera.gameObject.SetActive(isFirstPerson);  //1인칭 카메라 활성화 여부 
+        thirdPersonCamera.gameObject.SetActive(!isFirstPerson);  //3인칭 카메라 활성화 여부
     }
     void HandleCameraToggle()
     {
@@ -87,11 +91,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void SetAcitiveCamera()
-    {
-        firstPersonCamera.gameObject.SetActive(isFirstPerson);  //1인칭 카메라 활성화 여부 
-        thirdPersonCamera.gameObject.SetActive(!isFirstPerson);  //3인칭 카메라 활성화 여부
-    }
 
     public void HandleRotation()
     {
@@ -158,7 +157,7 @@ public class PlayerController : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
         }
 
-        rigidbody.MovePosition(rigidbody.position +movement * moveSpeed * Time.deltaTime);
+        rb.MovePosition(rb.position +movement * moveSpeed * Time.deltaTime);
     }
 
     //플레이어 점프를 처리하는 함수
@@ -167,14 +166,14 @@ public class PlayerController : MonoBehaviour
         //점프 버튼을 누르고 땅에 있을 때 
         if(isGrounded())
         {
-            rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);  //위쪽으로 힘을 가해 점프 
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);  //위쪽으로 힘을 가해 점프 
         }
 
    }
 
     public bool isFalling()
     {
-        return rigidbody.velocity.y < fallingThreshold && !isGrounded();
+        return rb.velocity.y < fallingThreshold && !isGrounded();
     }
     public bool isGrounded()
     {
@@ -183,7 +182,7 @@ public class PlayerController : MonoBehaviour
 
     public float GetVerticalVelocity() //플레이어의 Y축 속도 확인 
     {
-        return rigidbody.velocity.y;
+        return rb.velocity.y;
     }    
 
 }
